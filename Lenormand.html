@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rana George Lenormand Oracle</title>
+    <style>
+        /* 法式极简 / 职场精英风格 v1.2 */
+        :root {
+            --bg-color: #f9f9f9;
+            --card-bg: #ffffff;
+            --text-main: #1a1a1a;
+            --text-secondary: #555555;
+            --accent: #000000;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-family: 'Didot', 'Bodoni MT', serif;
+            font-weight: 400;
+            letter-spacing: 1px;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 50px;
+            align-items: center;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            border: 1px solid var(--accent);
+            background: transparent;
+            color: var(--text-main);
+            font-size: 16px;
+            width: 60px;
+            text-align: center;
+            outline: none;
+            font-family: inherit;
+        }
+
+        button {
+            background-color: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 11px 25px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        /* 修改部分：改用 Flexbox 实现完美居中 */
+        .results-grid {
+            display: flex;           
+            justify-content: center; /* 水平居中关键属性 */
+            flex-wrap: wrap;         /* 允许换行 */
+            gap: 20px;
+            width: 100%;
+            max-width: 1100px;       /* 稍微放宽一点，适应宽屏 */
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 30px 20px;      /* 增加内部留白，更优雅 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            transition: transform 0.2s ease;
+            
+            /* 固定卡片宽度，确保排列整齐 */
+            flex: 0 0 220px;         
+            min-height: 140px;       /* 保证视觉高度一致性 */
+            justify-content: center;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .card-number {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            font-family: 'Didot', serif;
+            letter-spacing: 1px;
+        }
+
+        .card-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: capitalize;
+        }
+
+        .card-keywords {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-style: italic;
+            line-height: 1.5;
+            max-width: 90%;
+        }
+
+        footer {
+            margin-top: auto;
+            padding-top: 50px;
+            font-size: 11px;
+            color: #aaa;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Rana George Lenormand</h1>
+
+    <div class="controls">
+        <input type="number" id="cardCount" min="1" max="40" value="3">
+        <button onclick="drawCards()">Draw Cards</button>
+    </div>
+
+    <div id="results" class="results-grid"></div>
+
+    <footer>
+        Standard 36 + 4 Rana George Specials
+    </footer>
+
+    <script>
+        const deck = [
+            {id: 1, name: "The Rider", keywords: "消息、速度、来访者、能量"},
+            {id: 2, name: "The Clover", keywords: "运气、机会、小确幸、短暂"},
+            {id: 3, name: "The Ship", keywords: "旅行、距离、国际、探索"},
+            {id: 4, name: "The House", keywords: "家庭、隐私、安全、不动产"},
+            {id: 5, name: "The Tree", keywords: "健康、成长、根基、耐心"},
+            {id: 6, name: "The Clouds", keywords: "困惑、不确定、误解、阴霾"},
+            {id: 7, name: "The Snake", keywords: "渴望、复杂、背叛、策略"},
+            {id: 8, name: "The Coffin", keywords: "结束、停滞、疾病、重生"},
+            {id: 9, name: "The Bouquet", keywords: "礼物、美丽、欣赏、邀请"},
+            {id: 10, name: "The Scythe", keywords: "突然切断、危险、手术、收获"},
+            {id: 11, name: "The Whip", keywords: "冲突、重复、清理、体力活动"},
+            {id: 12, name: "The Birds", keywords: "交谈、八卦、焦虑、伴侣"},
+            {id: 13, name: "The Child", keywords: "新开始、纯真、微小、孩子"},
+            {id: 14, name: "The Fox", keywords: "工作、狡猾、谨慎、为了生存"},
+            {id: 15, name: "The Bear", keywords: "力量、保护、财务、权威"},
+            {id: 16, name: "The Stars", keywords: "希望、指引、清晰、广阔"},
+            {id: 17, name: "The Stork", keywords: "改变、迁移、升级、诞生"},
+            {id: 18, name: "The Dog", keywords: "忠诚、友谊、支持、信任"},
+            {id: 19, name: "The Tower", keywords: "机构、孤独、界限、法律"},
+            {id: 20, name: "The Garden", keywords: "公众、社交、网络、聚会"},
+            {id: 21, name: "The Mountain", keywords: "障碍、延迟、遥远、寒冷"},
+            {id: 22, name: "The Crossroads", keywords: "选择、多重路径、决定、替代方案"},
+            {id: 23, name: "The Mice", keywords: "压力、损耗、盗窃、焦虑"},
+            {id: 24, name: "The Heart", keywords: "爱、激情、情感中心、浪漫"},
+            {id: 25, name: "The Ring", keywords: "承诺、合同、循环、结合"},
+            {id: 26, name: "The Book", keywords: "秘密、知识、教育、未揭示"},
+            {id: 27, name: "The Letter", keywords: "文件、书面信息、结果、通知"},
+            {id: 28, name: "The Gentleman", keywords: "男性当事人、阳刚能量"},
+            {id: 29, name: "The Lady", keywords: "女性当事人、阴柔能量"},
+            {id: 30, name: "The Lily", keywords: "和平、成熟、长期、智慧"},
+            {id: 31, name: "The Sun", keywords: "成功、活力、快乐、显化"},
+            {id: 32, name: "The Moon", keywords: "名声、直觉、潜意识、认可"},
+            {id: 33, name: "The Key", keywords: "解决方案、命运、重要、成功"},
+            {id: 34, name: "The Fish", keywords: "丰富、商业、流动、独立"},
+            {id: 35, name: "The Anchor", keywords: "稳定、目标、坚持、安全"},
+            {id: 36, name: "The Cross", keywords: "信仰、负担、痛苦、业力"},
+            {id: 37, name: "The Spirit", keywords: "灵性、保护、祖先、超越物质"},
+            {id: 38, name: "The Incense Burner", keywords: "净化、清理、冥想、消除负能量"},
+            {id: 39, name: "The Bed", keywords: "亲密、休息、性、治愈"},
+            {id: 40, name: "The Market", keywords: "交易、同事、交换、工作场所"}
+        ];
+
+        function drawCards() {
+            const countInput = document.getElementById('cardCount');
+            let count = parseInt(countInput.value);
+            const resultsDiv = document.getElementById('results');
+            
+            if (count < 1) count = 1;
+            if (count > 40) count = 40;
+            countInput.value = count;
+
+            resultsDiv.innerHTML = ''; 
+
+            let shuffled = [...deck];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+
+            const selection = shuffled.slice(0, count);
+
+            selection.forEach((card, index) => {
+                setTimeout(() => {
+                    const cardEl = document.createElement('div');
+                    cardEl.className = 'card';
+                    cardEl.innerHTML = `
+                        <div class="card-number">No. ${card.id}</div>
+                        <div class="card-name">${card.name}</div>
+                        <div class="card-keywords">${card.keywords}</div>
+                    `;
+                    resultsDiv.appendChild(cardEl);
+                    // 添加一个小动画让出现更平滑
+                    cardEl.animate([
+                        { opacity: 0, transform: 'translateY(10px)' },
+                        { opacity: 1, transform: 'translateY(0)' }
+                    ], {
+                        duration: 300,
+                        fill: 'forwards'
+                    });
+                }, index * 80); 
+            });
+        }
+    </script>
+</body>
+</html>
